@@ -4,6 +4,8 @@
 
 #include <stddef.h>
 #include <setjmp.h>
+#include <string>
+#include "../cocos2d-x/cocos/platform/CCPlatformMacros.h"
 
 
 #ifndef PB_NS_BEGIN
@@ -315,6 +317,8 @@ PB_NS_END
 #include <stdlib.h>
 #include <string.h>
 
+#include "../cocos2d-x/cocos/platform/CCFileUtils.h"
+USING_NS_CC;
 
 PB_NS_BEGIN
 
@@ -574,15 +578,40 @@ PB_API void* pb_prepbuffsize(pb_Buffer *b, size_t len) {
 }
 
 PB_API void pb_addfile(pb_Buffer *b, const char *filename) {
-    FILE *fp = fopen(filename, "rb");
-    if (fp == NULL) return;
-    do {
-        char *buff = (char*)pb_prepbuffsize(b, BUFSIZ);
-        size_t ret = fread(buff, 1, BUFSIZ, fp);
-        pb_addsize(b, ret);
-        if (ret == 0 || ret < BUFSIZ) break;
-    } while (1);
-    fclose(fp);
+//#if (CC_TARGET_PLATFORM == CC_PLATFORM_UNKNOWN)
+//	//获得文件在系统的绝对路径
+//	//读取的字节数，读取失败则为0
+//	unsigned long len = 0;
+//	//读取的内容
+//	unsigned char *data = FileUtils::getFileData(filepath, "rb", &len);
+//	b->size = len;
+//	strcpy(b->buff, data);
+//	//记得释放内存
+//	if(len >0 && data) delete[] data;
+//#else
+	std::string filepath = FileUtils::getInstance()->fullPathForFilename(filename);
+	
+//	unsigned char *ss = FileUtils::getInstance()->getFileData(filepath,"rb",&len);
+	Data data = FileUtils::getInstance()->getDataFromFile(filepath);
+	unsigned char *string = data.getBytes();
+	ssize_t len = data.getSize();
+	memcpy(b->buff, string, len);
+	b->size = len;
+//	FILE *fp = fopen(filename, "rb");
+//	//	CCLOG("sdfoso %s", cocos2d::FileUtils::getInstance()->getSuitableFOpen(filename).c_str());
+//	CCLOG("sldldll %d ", fp == NULL);
+//
+//	if (fp == NULL) return;
+//	do {
+//		char *buff = (char*)pb_prepbuffsize(b, BUFSIZ);
+//		size_t ret = fread(buff, 1, BUFSIZ, fp);
+//		pb_addsize(b, ret);
+//		if (ret == 0 || ret < BUFSIZ) break;
+//	} while (1);
+//	fclose(fp);
+//	CCLOG("%s ",b->buff);
+//#endif
+
 }
 
 PB_API void pb_addslice(pb_Buffer *b, pb_Slice s) {

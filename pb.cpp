@@ -21,7 +21,7 @@
 
 # define LUA_OK        0
 # define lua_rawlen    lua_objlen
-# define luaL_newlib(L,l) (lua_newtable(L), luaL_register(L,NULL,l))
+# define luaL_newlib(L,l,name) (lua_newtable(L), luaL_register(L,name,l))
 # define luaL_setfuncs(L,l,n) (assert(n==0), luaL_register(L,NULL,l))
 # define luaL_setmetatable(L, name) \
     (luaL_getmetatable((L), (name)), lua_setmetatable(L, -2))
@@ -444,7 +444,7 @@ LUALIB_API int luaopen_pb(lua_State *L) {
 #undef  ENTRY
         { NULL, NULL }
     };
-    luaL_newlib(L, libs);
+    luaL_newlib(L, libs, "pb");
     return 1;
 }
 
@@ -520,7 +520,7 @@ LUALIB_API int luaopen_pb_conv(lua_State *L) {
 #undef  ENTRY
         { NULL, NULL }
     };
-    luaL_newlib(L, libs);
+    luaL_newlib(L, libs, "pb.conv");
     return 1;
 }
 
@@ -595,7 +595,7 @@ LUALIB_API int luaopen_pb_io(lua_State *L) {
 #undef  ENTRY
         { NULL, NULL }
     };
-    luaL_newlib(L, libs);
+    luaL_newlib(L, libs, "pb.io");
     return 1;
 }
 
@@ -1193,6 +1193,24 @@ LUALIB_API int luaopen_pb_slice(lua_State *L) {
         lua_pushvalue(L, -1);
     }
     return 1;
+}
+
+LUALIB_API int register_pb(lua_State *L)
+{
+//	int top = lua_gettop(L);
+//
+//	lua_getglobal(L, "_G");
+//	luaL_newmetatable(L, "_G.pb");
+//	lua_setfield(L, -2, "pb");
+//	lua_getfield(L, -1, "pb");
+	luaopen_pb(L);
+//	luaopen_pb_io(L);
+//	luaopen_pb_conv(L);
+//	lua_setfield(L,-1,"__index");
+//	luaopen_pb_slice(L);
+//	lua_pop(L, 1);
+//	printf("oosdosdo");
+	return 1;
 }
 
 /* win32cc: flags+='-ggdb -O3 -mdll -DLUA_BUILD_AS_DLL'
